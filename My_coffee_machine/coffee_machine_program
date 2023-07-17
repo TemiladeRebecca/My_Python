@@ -1,0 +1,71 @@
+#!/usr/bin/python3
+
+profit = 0
+
+def check_transaction_successful(total_amount, drink_cost):
+    """Checks the total amount received from the user against the coffee cost"""
+  if total_amount > drink_cost:
+    global profit
+    profit += drink_cost
+    change = round(total_amount - drink_cost, 2)
+    print(f"Here is your ${change} in change")
+    return True
+  else:
+    print("Sorry that's not enough money. Money refunded.")
+    return False
+    
+
+def check_resources(order_ingredients):
+  """Checks if the ingredients to make the selected coffee type is sufficient"""
+  for item in order_ingredients:
+      if order_ingredients[item] >= resources[item]:
+        print(f"Sorry there is not enough {item}.")
+        return False
+  return True
+    
+
+def available_ingredients(order_ingredients, drink_name):
+  """Checks the available ingredients"""
+  for item in order_ingredients:
+    resources[item] -= order_ingredients[item]
+  print(f"Here is your {drink_name} ☕. Enjoy!")
+    
+  
+def process_coins():
+  """Processes the amount recieved from the user"""
+  print("Please insert coins")
+  quarter = int(input("how many quarters?: $")) * 0.25
+  dimes = int(input("how many dimes?: $")) * 0.10
+  nickles = int(input("how many nickles?: $")) * 0.05
+  pennies = int(input("how many pennies?: $")) * 0.01
+  Total_amount = quarter + dimes + nickles + pennies
+  return Total_amount
+
+
+def make_coffee():
+  is_on = True
+  while is_on:
+    coffee_type = input("What would you like? (espresso/latte/cappuccino): ").lower()
+    if coffee_type == 'off':
+      is_on = False
+    elif coffee_type == ("Report").lower():
+      print(f"water: {resources['water']}ml")
+      print(f"coffee: {resources['coffee']}g")
+      print(f"milk: {resources['milk']}ml")
+      print(f"profit = ${profit}")
+    else:
+      coffee = MENU[coffee_type]
+      print(f"Your coffee costs {coffee['cost']}")
+      response = input("Would you like to proceed. Type 'yes' or 'no': ").lower()
+      if response == 'no':
+          return False
+      is_resources_sufficient = check_resources(coffee["ingredients"])
+      if is_resources_sufficient:
+        payment = process_coins()
+        if check_transaction_successful(payment, coffee["cost"]):
+          available_ingredients(coffee["ingredients"], coffee_type)
+        else:
+          is_resources_sufficient = False
+        
+
+make_coffee()
